@@ -10,12 +10,12 @@ public class ALColbertCountyBParser extends FieldProgramParser {
   
   public ALColbertCountyBParser() {
     super("COLBERT COUNTY", "AL", 
-          "ID! TYPE:CALL! LOC:ADDR! CITY:CITY! GPS UNIT:UNIT! Comments:INFO/N+");
+          "ID TYPE:CALL! LOC:ADDR! CITY:CITY! GPS UNIT:UNIT! Comments:INFO/N+");
   }
   
   @Override
   public String getFilter() {
-    return "colbertcoal@911email.net,e-alerts@colbert911.org";
+    return "colbertcoal@911email.net,e-alerts@colbert911.org,DISPATCH";
   }
 
   @Override

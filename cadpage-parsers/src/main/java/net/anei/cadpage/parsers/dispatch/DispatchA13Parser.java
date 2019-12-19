@@ -119,7 +119,7 @@ public class DispatchA13Parser extends FieldProgramParser {
     }
   }
   
-  private static final Pattern STATUS_PTN = Pattern.compile("\\b(?:Dispatched|Req[ _]?Dispatch|(Acknowledge|Enroute|En Route Hosp|Responding|On *Scene|Standing ?By|Stack|In Command|Staged|Staging|ArrivedAtDestination|Transport)|(Disposed|Terminated))\\b", Pattern.CASE_INSENSITIVE);
+  private static final Pattern STATUS_PTN = Pattern.compile("\\b(?:Dispatched|Req[ _]?Dispatch|(Acknowledge|Enroute|En Route Hosp|Responding|On *Scene|Standby|Standing ?By|Stack|In Command|Staged|Staging|ArrivedAtDestination|Transport)|(Disposed|Terminated))\\b", Pattern.CASE_INSENSITIVE);
   private class BaseStatusField extends Field {
     @Override
     public void parse(String field, Data data) {
@@ -229,6 +229,19 @@ public class DispatchA13Parser extends FieldProgramParser {
             sPart4 = sPart5 = "";
           }
         }
+        if (sPart1.length() == 0) {
+          if (sPart2.length() > 0) {
+            sPart1 = sPart2;
+            sPart2 = "";
+          } else if (sPart3.length() > 0) {
+            sPart1 = sPart3;
+            sPart3 = "";
+          } else if (sPart4.length() > 0) {
+            sPart1 = sPart4;
+            sPart4 = "";
+          }
+          else return;
+        }
         
         String addr = null;
         boolean incomplete = false;
@@ -304,37 +317,39 @@ public class DispatchA13Parser extends FieldProgramParser {
           data.strCross = append(data.strCross, " / ", fld);
         }
         
-        StartType st = (includeCall && (leadPlaceName | leadPlace) ? StartType.START_CALL_PLACE :
-                        includeCall ? StartType.START_CALL :
-                        leadPlaceName || leadPlace ? StartType.START_OTHER 
-                                                   : StartType.START_ADDR);
-        int flags = FLAG_IGNORE_AT;
-        if (includeCall) flags |= FLAG_START_FLD_REQ;
-        flags |= (trailPlace ? FLAG_PAD_FIELD : FLAG_ANCHOR_END);
-        String saveCall = null;
-        if (includeCall) {
-          saveCall = data.strCall;
-          data.strCall = "";
-        }
-        if (data.strCity.length() > 0) flags |= FLAG_NO_CITY;
-        String place;
-        if (addr != null) parseAddress(st, flags, addr, data);
-        if (includeCall) {
-          data.strCall = append(saveCall, " - ", data.strCall);
-          place = data.strPlace;
-          data.strPlace = "";
-        } else {
-          place = getStart();
-        }
-        if (place.length() > 0) {
-          if (data.strAddress.length() == 0) {
-            parseAddress(place, data);
+        if (addr != null) {
+          StartType st = (includeCall && (leadPlaceName | leadPlace) ? StartType.START_CALL_PLACE :
+                          includeCall ? StartType.START_CALL :
+                          leadPlaceName || leadPlace ? StartType.START_OTHER 
+                                                     : StartType.START_ADDR);
+          int flags = FLAG_IGNORE_AT;
+          if (includeCall) flags |= FLAG_START_FLD_REQ;
+          flags |= (trailPlace ? FLAG_PAD_FIELD : FLAG_ANCHOR_END);
+          String saveCall = null;
+          if (includeCall) {
+            saveCall = data.strCall;
+            data.strCall = "";
           }
-          else if (leadPlace || checkPlace(place)) {
-            addPlace(place, data);
+          if (data.strCity.length() > 0) flags |= FLAG_NO_CITY;
+          String place;
+          if (addr != null) parseAddress(st, flags, addr, data);
+          if (includeCall) {
+            data.strCall = append(saveCall, " - ", data.strCall);
+            place = data.strPlace;
+            data.strPlace = "";
+          } else {
+            place = getStart();
           }
-          else {
-            data.strName = place;
+          if (place.length() > 0) {
+            if (data.strAddress.length() == 0) {
+              parseAddress(place, data);
+            }
+            else if (leadPlace || checkPlace(place)) {
+              addPlace(place, data);
+            }
+            else {
+              data.strName = place;
+            }
           }
         }
         
@@ -363,7 +378,7 @@ public class DispatchA13Parser extends FieldProgramParser {
         // If it starts with a slash, this is probably the intersection with
         // cities after both streets again :(
         if (trailPlace) {
-          place = getPadField();
+          String place = getPadField();
           if (isCity(place)) {
             data.strCity = place;
           } else {
@@ -482,6 +497,13 @@ public class DispatchA13Parser extends FieldProgramParser {
           sb.append(part);
         }
         data.strCross = sb.toString();
+      }
+      
+      // If the address is a naked ampersand, try to parse the address from the place field
+      if (data.strAddress.equals("&") && data.strPlace.length() > 0) {
+        data.strAddress = "";
+        parseAddress(StartType.START_ADDR, FLAG_IMPLIED_INTERSECT | FLAG_ANCHOR_END, data.strPlace, data);
+        data.strPlace = "";
       }
     }
     

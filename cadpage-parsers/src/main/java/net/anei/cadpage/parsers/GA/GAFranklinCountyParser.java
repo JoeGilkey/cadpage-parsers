@@ -12,12 +12,13 @@ public class GAFranklinCountyParser extends DispatchSouthernParser {
   
   public GAFranklinCountyParser() {
     super(CITY_LIST, "FRANKLIN COUNTY", "GA", 
-          DSFLAG_DISPATCH_ID | DSFLAG_ID_OPTIONAL | DSFLAG_FOLLOW_CROSS);
+          DSFLG_OPT_DISP_ID | DSFLG_ADDR | DSFLG_ADDR_TRAIL_PLACE | DSFLG_OPT_X | DSFLG_OPT_NAME | DSFLG_TIME);
+    setupSaintNames("MARYS");
   }
   
   @Override
   public String getFilter() {
-    return "FC911@franklincountyga.com";
+    return "FC911@franklincountyga.com,FC911@gumlog.net,7064911018@mms.firstnet-mail.com";
   }
   
   @Override
@@ -33,9 +34,23 @@ public class GAFranklinCountyParser extends DispatchSouthernParser {
   }
   private static final Pattern NOT_APT_PTN = Pattern.compile("I[- ].*", Pattern.CASE_INSENSITIVE);
 
-
-
-
+  @Override
+  protected int getExtraParseAddressFlags() {
+    return FLAG_IMPLIED_INTERSECT;
+  }
+  
+  @Override
+  public String adjustMapAddress(String sAddress,  boolean cross) {
+    if (cross) {
+      int pt = sAddress.indexOf('/');
+      if (pt >= 0) sAddress = sAddress.substring(0,pt).trim();
+      if (checkAddress(sAddress) == STATUS_FULL_ADDRESS) {
+        pt = sAddress.indexOf(' ');
+        if (pt >= 0) sAddress = sAddress.substring(pt+1).trim();
+      }
+    }
+    return super.adjustMapAddress(sAddress, cross);
+  }
   private static final String[] CITY_LIST = new String[]{
     "CANON",
     "CARNESVILLE",
@@ -46,7 +61,10 @@ public class GAFranklinCountyParser extends DispatchSouthernParser {
     "ROYSTON",
     
     // Jackson County
-    "COMMERCE"
+    "COMMERCE",
+    
+    // Stephens County
+    "TOCCOA"
   };
 
 }

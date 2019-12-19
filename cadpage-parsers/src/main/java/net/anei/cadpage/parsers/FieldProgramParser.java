@@ -445,6 +445,9 @@ public class FieldProgramParser extends SmartAddressParser {
     
     // Empty string is a special, easily handled, case
     if (program.length() == 0) {
+      if (failStep != null) {
+        throw new RuntimeException("Deferred optional status of was not resolved by empty program");
+      }
       headLink.setLink(tail);
       return;
     }
@@ -1005,6 +1008,7 @@ public class FieldProgramParser extends SmartAddressParser {
    */
   protected boolean parseFields(String[] fields, Data data) {
     
+    gpsFldCnt = 0;
     fieldRecord = new Field[fields.length];
     state = new State(fields);
     
@@ -1015,20 +1019,22 @@ public class FieldProgramParser extends SmartAddressParser {
       initStepScan();
       
       // Loop through all of the fields
+      boolean parenKey = breakChar == ')';
+      int iStartKey = parenKey ? 1 : 0;
       int fldNdx = 0;
       for (String field : fields) {
         
         // Break field into keyword and value
         field = field.trim();
-        int pt = field.indexOf(breakChar);
-        String tag, value;
-        if (pt < 0) {
-          tag = "";
-          value = field;
-        } else {
-          tag = field.substring(0, pt).trim();
-          if (ignoreCase) tag = tag.toUpperCase();
-          value = field.substring(pt+1).trim();
+        String tag = "";
+        String value = field;
+        if (!parenKey || field.startsWith("("))  {
+          int pt = field.indexOf(breakChar);
+          if (pt >= 0) {
+            tag = field.substring(iStartKey, pt).trim();
+            if (ignoreCase) tag = tag.toUpperCase();
+            value = field.substring(pt+1).trim();
+          }
         }
         
         // Get the field associated with this keyword
@@ -1039,7 +1045,9 @@ public class FieldProgramParser extends SmartAddressParser {
           value = field;
           step = keywordMap.get("");
         }
-        if (step == null) return false;
+        if (step == null) {
+          return false;                               // BREAKPOINT
+        }
         
         // Flag step as processed
         step.markChecked();
@@ -1050,7 +1058,7 @@ public class FieldProgramParser extends SmartAddressParser {
             state.setIndex(fldNdx);
             step.field.parse(value, data);
           } catch (FieldProgramException ex) {
-            return false;
+            return false;                               // BREAKPOINT
           }
           fieldRecord[fldNdx++] = step.field.getProcField();
         }
@@ -1567,6 +1575,8 @@ public class FieldProgramParser extends SmartAddressParser {
       if (parseTags && !(field instanceof SelectField)) {
         Step startStep = this;
         int startNdx = ndx;
+        boolean parenBreak = breakChar == ')';
+        int iStartKey = parenBreak ? 1 : 0;
         while (true) {
           
           // See if data field is tagged
@@ -1574,12 +1584,14 @@ public class FieldProgramParser extends SmartAddressParser {
           procStep = startStep;
           String curTag = null;
           String curVal = null;
-          int pt = curFld.indexOf(breakChar);
-          if (pt >= 0) {
-            curTag = curFld.substring(0, pt).trim();
-            if (ignoreCase) curTag = curTag.toUpperCase();
-            curVal = curFld.substring(pt+1);
-            if (!doNotTrim) curVal = curVal.trim();
+          if (!parenBreak || curFld.startsWith("(")) {
+            int pt = curFld.indexOf(breakChar);
+            if (pt >= 0) {
+              curTag = curFld.substring(iStartKey, pt).trim();
+              if (ignoreCase) curTag = curTag.toUpperCase();
+              curVal = curFld.substring(pt+1);
+              if (!doNotTrim) curVal = curVal.trim();
+            }
           }
           
           // If this is an optional tagged step, take failure branch
@@ -3287,6 +3299,7 @@ public class FieldProgramParser extends SmartAddressParser {
    */
   
   private static final Pattern LONG_GPS_PTN = Pattern.compile("\\b(\\d{1,3})(\\d{6})\\b");
+  private int gpsFldCnt = 0;
   private String saveGPSLoc = "";
   public class GPSField extends Field {
     
@@ -3346,7 +3359,14 @@ public class FieldProgramParser extends SmartAddressParser {
       if (addDec) {
         field = LONG_GPS_PTN.matcher(field).replaceAll("$1.$2");
       }
-      switch (type) {
+      int tmp;
+      if (type == 3) {
+        tmp = ++gpsFldCnt;
+        if (tmp > 2) return;
+      } else {
+        tmp = type;
+      }
+      switch (tmp) {
       case 1:
         saveGPSLoc = field;
         break;
@@ -3905,6 +3925,7 @@ public class FieldProgramParser extends SmartAddressParser {
     if (name.equals("GPS")) return new GPSField();
     if (name.equals("GPS1")) return new GPSField(1);
     if (name.equals("GPS2")) return new GPSField(2);
+    if (name.equals("GPS3")) return new GPSField(3);
     if (name.equals("DATE")) return new DateField();
     if (name.equals("TIME")) return new TimeField();
     if (name.equals("DATETIME")) return new DateTimeField();

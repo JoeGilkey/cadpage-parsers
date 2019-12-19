@@ -1,6 +1,7 @@
 package net.anei.cadpage.parsers.dispatch;
 
 import java.util.Locale;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,9 +31,13 @@ public class DispatchA19Parser extends FieldProgramParser {
   }
   
   public DispatchA19Parser(String defCity, String defState) {
-    super(defCity, defState,
-           "( Incident_#:ID! CAD_Call_ID_#:ID! Type:SKIP/R! Date/Time:TIMEDATE! ( Address:ADDR! City:CITY? Contact:NAME? Contact_Address:SKIP? Contact_Phone:PHONE? | ) Nature:CALL! Nature_Description:INFO/N? Comments:INFO/N INFO/N+? TIME_MARK TIMES/N+ " +
-           "| INCIDENT:ID? LONG_TERM_CAD:ID? ACTIVE_CALL:ID? PRIORITY:PRI? REPORTED:TIMEDATE? Nature:CALL! Type:SKIP! ( Address:ADDR! Zone:MAP! | Zone:MAP! Address:ADDR! ) City:CITY? SearchAddresss:SKIP? LAT-LON:GPS? Responding_Units:UNIT! Directions:INFO/N? INFO/N+ Cross_Streets:X? X/Z+? ( LAT-LON | XY_Coordinates:XYPOS | XCoords:XY_COORD ) Comments:INFO/N? INFO/N+ Contact:NAME Phone:PHONE )");
+    this(null, defCity, defState);
+  }
+  
+  public DispatchA19Parser(Properties cityCodes, String defCity, String defState) {
+    super(cityCodes, defCity, defState,
+          "( Incident_#:ID! CAD_Call_ID_#:ID! Type:SKIP/R! Date/Time:TIMEDATE! ( Address:ADDR! City:CITY? Contact:NAME? Contact_Address:SKIP? Contact_Phone:PHONE? | ) Nature:CALL! Nature_Description:INFO/N? Comments:INFO/N INFO/N+? TIME_MARK TIMES/N+ " +
+          "| INCIDENT:ID? LONG_TERM_CAD:ID? ACTIVE_CALL:ID? PRIORITY:PRI? REPORTED:TIMEDATE? Nature:CALL! Type:SKIP! ( Address:ADDR! Zone:MAP! | Zone:MAP! Address:ADDR! ) City:CITY? SearchAddresss:SKIP? LAT-LON:GPS? Responding_Units:UNIT! Directions:INFO/N? INFO/N+ Cross_Streets:X? X/Z+? ( LAT-LON | XY_Coordinates:XYPOS | XCoords:XY_COORD ) Comments:INFO/N? INFO/N+ Contact:NAME Phone:PHONE )");
   }
   
   @Override
@@ -142,16 +147,24 @@ public class DispatchA19Parser extends FieldProgramParser {
     }
   }
 
-  private static final Pattern DATE_TIME_OPER_PTN = Pattern.compile("(\\d\\d:\\d\\d:\\d\\d) (\\d\\d/\\d\\d/\\d{4}) - .*");
+  private static final Pattern DATE_TIME_OPER1_PTN = Pattern.compile("(\\d\\d:\\d\\d:\\d\\d) (\\d\\d/\\d\\d/\\d{4}) - .*");
+  private static final Pattern DATE_TIME_OPER2_PTN = Pattern.compile("(\\d\\d/\\d\\d/\\d\\d) (\\d\\d:\\d\\d:\\d\\d) [ A-Z]+(?::|From:.*)");
   private static final Pattern PHONE_GPS_PTN = Pattern.compile("CALLBACK=([-()\\d]+) LAT=([-+]\\d+\\.\\d+) LON=([-+]\\d+\\.\\d+) UNC=\\d+");
   private static final Pattern INFO_JUNK_PTN = Pattern.compile("ProQA Fire.*|[A-Za-z0-9 ]+:");
   private class BaseInfoField extends InfoField {
     @Override
     public void parse(String field, Data data) {
-      Matcher match = DATE_TIME_OPER_PTN.matcher(field);
+      Matcher match = DATE_TIME_OPER1_PTN.matcher(field);
       if (match.matches()) {
         data.strTime = match.group(1);
         data.strDate = match.group(2);
+        return;
+      }
+      
+      match = DATE_TIME_OPER2_PTN.matcher(field);
+      if (match.matches()) {
+        data.strDate = match.group(1);
+        data.strTime = match.group(2);
         return;
       }
       

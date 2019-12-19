@@ -215,7 +215,7 @@ public class DispatchOSSIParser extends FieldProgramParser {
   }
   
   private static final Pattern UNIT_PFX_PTN = Pattern.compile("(?:\\{([A-Z0-9,]+)\\} *)(.*)");
-  private static final Pattern CANCEL_PTN = Pattern.compile("(CANCEL\\b.*|CODE RED|CONFIRMED FIRE.*|CONFIRMED PIN IN|FIRE OUT|FIRE UNDER CONTROL|UNDER CONTROL|UNITS RESPOND CODE 1)");
+  private static final Pattern CANCEL_PTN = Pattern.compile("(CANCEL\\b.*|.*\\bCOMMAND ESTABLISHED|CODE RED|CONFIRMED FIRE.*|CONFIRMED PIN IN|FIRE OUT|FIRE UNDER CONTROL|UNDER CONTROL|UNITS RESPOND CODE 1)");
   protected class BaseCancelField extends CallField {
     
     private Pattern extraPattern;
@@ -236,18 +236,17 @@ public class DispatchOSSIParser extends FieldProgramParser {
     
     @Override
     public boolean checkParse(String field, Data data) {
-      String unit = null;
       Matcher match = UNIT_PFX_PTN.matcher(field);
       if (match.matches()) {
-        unit = match.group(1);
-        field = match.group(2);
+        data.strUnit = match.group(1);
+        data.strCall = match.group(2);
+        return true;
       }
       match = CANCEL_PTN.matcher(field);
       if (!match.matches()) {
         if (extraPattern == null) return false;
         if (!extraPattern.matcher(field).matches()) return false;
       }
-      if (unit != null) data.strUnit = unit;
       data.strCall = field;
       return true;
     }

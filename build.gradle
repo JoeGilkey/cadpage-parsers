@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.2'
+        classpath 'com.android.tools.build:gradle:3.5.2'
         classpath 'com.google.gms:google-services:4.2.0'
     }
 }
@@ -21,8 +21,8 @@ allprojects {
 }
 
 ext {
-    versionName = "2.1.4-04"
-    versionCode = 120104040
+    versionName = "2.1.7-18"
+    versionCode = 1020107180
 }
 
 task gstatus(type: Exec) {

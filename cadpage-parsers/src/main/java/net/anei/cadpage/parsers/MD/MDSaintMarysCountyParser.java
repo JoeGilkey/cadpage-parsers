@@ -181,6 +181,7 @@ public class MDSaintMarysCountyParser extends SmartAddressParser {
   }
 
   private static final Properties GPS_LOOKUP_TABLE = buildCodeTable(new String[]{
+      "45325 ABELL HOUSE LN",                 "+38.298550,-76.508292",
       "44100A LOUISDALE RD",                  "+38.294415,-76.558088",
       "44100B LOUISDALE RD",                  "+38.293484,-76.558780",
       "44605 BARNES AND YEH LANE",            "+38.289400,-76.532300",
@@ -189,7 +190,9 @@ public class MDSaintMarysCountyParser extends SmartAddressParser {
       "44683 BARNES AND YEH LANE",            "+38.285600,-76.530600",
       "46155 CARVER SCHOOL BL",               "+38.250002,-76.480090",
       "43950 CASEYS LN",                      "+38.283806,-76.556252",
+      "25390 COLTON POINT RD",                "+38.360118,-76.706042",
       "48017 CROSS MANOR RD",                 "+38.159970,-76.414850",
+      "20845 DAISY LN",                       "+38.237791,-76.460179",
       "23520 FDR BOULEVARD",                  "+38.303844,-76.524341",
       "23550 FDR BOULEVARD",                  "+38.304432,-76.524862",
       "23580 FDR BOULEVARD",                  "+38.305154,-76.525273",
@@ -202,6 +205,7 @@ public class MDSaintMarysCountyParser extends SmartAddressParser {
       "45975 FOXCHASE DR",                    "+38.255842,-76.490476",
       "45985 FOXCHASE DR",                    "+38.255207,-76.490182",
       "21412 GREAT MILLS RD BWING",           "+38.254868,-76.477345",
+      "45298 HAPPYLAND RD",                   "+38.207787,-76.508714",
       "46860 HILTON DR BLDG 1",               "+38.247680,-76.459357",
       "46860 HILTON DR BLDG 2",               "+38.248052,-76.459638",
       "46860 HILTON DR BLDG 3",               "+38.248016,-76.460045",
@@ -242,6 +246,7 @@ public class MDSaintMarysCountyParser extends SmartAddressParser {
       "22505 JOHNSON POND LANE",              "+38.286000,-76.550400",
       "22525 JOHNSON POND LANE",              "+38.286300,-76.550800",
       "22550 JOHNSON POND LANE",              "+38.286500,-76.550700",
+      "45889 KETCH COURT",                    "+38.242582,-76.487140",
       "44096 LOUISDALE RD",                   "+38.296261,-76.562480",
       "44100 LOUISDALE RD",                   "+38.295197,-76.558400",
       "45770 MILITARY LANE",                  "+38.282760,-76.492340",
@@ -262,6 +267,7 @@ public class MDSaintMarysCountyParser extends SmartAddressParser {
       "22028 OXFORD CT",                      "+38.273434,-76.468369",
       "22030 OXFORD CT",                      "+38.273478,-76.468200",
       "48676 PACKER CT",                      "+38.155650,-76.391350",
+      "23060 PARK PLACE WAY",                 "+38.299107,-76.510502",
       "43738 STEPHENSON DR",                  "+38.198215,-76.563438",
       "42831 THERESAS WY",                    "+38.368228,-76.595153",
       "22589 THREE NOTCH RD",                 "+38.287556,-76.480120",

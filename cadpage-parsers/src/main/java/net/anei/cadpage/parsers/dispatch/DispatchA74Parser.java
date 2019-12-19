@@ -28,7 +28,7 @@ public class DispatchA74Parser extends FieldProgramParser {
   
   @Override
   public Field getField(String name) {
-    if (name.equals("ID")) return new IdField("CAD #(\\d{2,8}-\\d+):", true);
+    if (name.equals("ID")) return new IdField("CAD #((?:\\d{2,8}-)?\\d+):", true);
     if (name.equals("ADDRCITY")) return new MyAddressCityField();
     if (name.equals("INFO")) return new MyInfoField();
     return super.getField(name);
@@ -40,6 +40,7 @@ public class DispatchA74Parser extends FieldProgramParser {
   private class MyAddressCityField extends AddressCityField {
     @Override
     public void parse(String field, Data data) {
+      field = stripFieldStart(field, "INTERSECTION:");
       Matcher match = ADDR_CITY_PTN.matcher(field);
       String apt = null;
       if (match.matches()) {
