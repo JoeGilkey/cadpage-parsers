@@ -1188,7 +1188,10 @@ public class PAAdamsCountyAParser extends DispatchA1Parser {
       "1075 OLD HARRISBURG RD APT 188",       "+39.853550,-77.212735",
       "1075 OLD HARRISBURG RD APT 190",       "+39.853577,-77.212840",
       "1075 OLD HARRISBURG RD APT 192",       "+39.853524,-77.212930",
-      
+
+      "1904 A OLD HARRISBURG RD",             "+39.874003,-77.206000",
+      "1904 B OLD HARRISBURG RD",             "+39.874600,-77.206900",
+
       "2581 OLD HARRISBURG RD APT 1",         "+39.890242,-77.191153",
       "2581 OLD HARRISBURG RD APT 2",         "+39.890330,-77.191033",
       "2581 OLD HARRISBURG RD APT 3",         "+39.890483,-77.190977",
@@ -1741,11 +1744,10 @@ public class PAAdamsCountyAParser extends DispatchA1Parser {
       
       "SKI LIBERTY - STATION 1A",             "+39.762931,-77.375453",
       "SKI LIBERTY - STATION 1B",             "+39.762314,-77.374811",
-      "SKI LIBERTY - STATION 2",              "+39.762314,-77.374811",
+      "SKI LIBERTY - STATION 2",              "+39.755893,-77.362693",
       "SKI LIBERTY – STATION 3",              "+39.759810,-77.363275",
       "SKI LIBERTY – STATION 4",              "+39.762617,-77.368438",
       "SKI LIBERTY – STATION 5",              "+39.763964,-77.374466"
-      
   });
 
   private static final String[] CITY_LIST = new String[]{

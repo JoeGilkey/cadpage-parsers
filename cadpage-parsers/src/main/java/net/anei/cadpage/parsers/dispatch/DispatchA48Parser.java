@@ -126,6 +126,7 @@ public class DispatchA48Parser extends FieldProgramParser {
           parser.setGPSLoc(match.group(1), data);
           field = field.substring(match.end());
         }
+        field = stripFieldStart(field, "1-");
         match = PHONE_PTN.matcher(field);
         if (match.lookingAt()) {
           data.strPhone = getOptGroup(match.group(1));
@@ -464,7 +465,7 @@ public class DispatchA48Parser extends FieldProgramParser {
   @Override
   public Field getField(String name) {
     if (name.equals("DATETIME")) return new BaseDateTimeField();
-    if (name.equals("ID")) return new IdField("\\d{4}-\\d{8}", true);
+    if (name.equals("ID")) return new IdField("\\d{4}-?\\d{8}", true);
     if (name.equals("CALL")) return new BaseCallField();
     if (name.equals("ADDRCITIY")) return new BaseAddressCityField();
     if (name.equals("DUPADDR")) return new BaseDupAddrField();
@@ -618,6 +619,7 @@ public class DispatchA48Parser extends FieldProgramParser {
     
     @Override
     public boolean checkParse(String field, Data data) {
+      field = stripFieldStart(field, "1-");
       Matcher match = PHONE_PTN.matcher(field);
       if (!match.matches()) return false;
       data.strPhone = getOptGroup(match.group(1));
