@@ -23,7 +23,7 @@ public class DispatchA52Parser extends FieldProgramParser {
   public DispatchA52Parser(Properties callCodes, Properties cityCodes, String defCity, String defState) {
     super(cityCodes, defCity, defState,
           "TYP:CODE1 MODCIR:CODE2 TYPEN:CALL TYPN:CALL CC_TEXT:CALL LOC:ADDR! BLD:APT FLR:APT APT:APT AD:PLACE DESC:PLACE CITY:CITY ZIP:ZIP CRSTR:X UNS:UNIT TIME:DATETIME3 INC:ID GRIDREF:MAP " +
-          "CMT:INFO/N PROBLEM:INFO/N CC:SKIP CASE__#:ID PRIORITY:PRI CALLER:NAME LOCDESC:NAME USER_ID:SKIP CREATED:SKIP RFD:SKIP LOCATION:SKIP", FLDPROG_ANY_ORDER | FLDPROG_IGNORE_CASE); 
+          "CMT:INFO/N PROBLEM:INFO/N CC:SKIP CASE__#:ID PRIORITY:PRI CALLER:NAME LOCDESC:NAME USER_ID:SKIP CREATED:SKIP RFD:SKIP LOCATION:SKIP LAT:GPS1 LONG:GPS2", FLDPROG_ANY_ORDER | FLDPROG_IGNORE_CASE); 
           
     this.callCodes = callCodes;
   }
@@ -36,7 +36,13 @@ public class DispatchA52Parser extends FieldProgramParser {
     if (!body.startsWith("LOC:") && !body.startsWith("TYPN")) return false;
     body = body.replace("LOC DESC:", "LOCDESC:");
     if (!super.parseMsg(body, data)) return false;
-    return (data.strCall.length() > 0);
+    if (data.strCall.length() == 0) return false;
+    if (data.strAddress.length() == 0 && data.strGPSLoc.length() > 0) {
+      int pt = data.strGPSLoc.indexOf(',');
+      data.strAddress = "LAT:" + data.strGPSLoc.substring(0,pt) + " LONG:" + data.strGPSLoc.substring(pt+1);
+      data.strGPSLoc = "";
+    }
+    return true;
   }
   
   @Override
@@ -58,6 +64,8 @@ public class DispatchA52Parser extends FieldProgramParser {
     if (name.equals("CITY")) return new MyCityField();
     if (name.equals("ZIP")) return new MyZipField();
     if (name.equals("MAP")) return new MyMapField();
+    if (name.equals("GPS1")) return new MyGPSField(1);
+    if (name.equals("GPS2")) return new MyGPSField(2);
     return super.getField(name);
   }
   
@@ -178,6 +186,19 @@ public class DispatchA52Parser extends FieldProgramParser {
       if (field.length() == 0) return;
       if (field.equals(data.strMap)) return;
       data.strMap = append(data.strMap, "-", field);
+    }
+  }
+  
+  private class MyGPSField extends GPSField {
+    public MyGPSField(int type) {
+      super(type);
+    }
+    
+    @Override
+    public void parse(String field, Data data) {
+      field = stripFieldStart(field, "<");
+      field = stripFieldEnd(field, ">");
+      super.parse(field, data);
     }
   }
 }

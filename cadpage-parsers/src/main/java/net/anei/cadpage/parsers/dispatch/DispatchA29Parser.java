@@ -17,7 +17,7 @@ public class DispatchA29Parser extends FieldProgramParser {
           "CALL:CALL! ADDR:ADDR! CITY:CITY! ID:ID! DATE:DATE! TIME:TIME! MAP:MAP UNIT:UNIT INFO:INFO");
   }
   
-  private static final Pattern MARKER1 = Pattern.compile("^DISPATCH:(?:([-_A-Z0-9]+)(?: |\n\n))?(?:([^-]\\S*:\\S+(?: (?:FD|ALS|BLS))?) )?");
+  private static final Pattern MARKER1 = Pattern.compile("^DISPATCH:(?:([-_A-Z0-9]+)(?: |\n\n))?(?:([^-]\\S*: *\\S+(?: (?:FD|ALS|BLS))?) )?");
   private static final Pattern MARKER2 = Pattern.compile("(?:(\\d\\d?/\\d\\d?) (\\d\\d?:\\d\\d?) - )?(?:([A-Z]{2,4}:\\d{2}-\\d{6}) )?");
   private static final Pattern CODE_PTN = Pattern.compile("([A-Z0-9]+) +");
   private static final Pattern UNIT_INFO_PTN = Pattern.compile("[ /\n]+((?:\\b[A-Z\\d]+:[-_A-Z\\d]+(?: FD|-\\d| \\d(?=,)|)\\b,?)++)[ /\n]*");
@@ -33,7 +33,7 @@ public class DispatchA29Parser extends FieldProgramParser {
     Matcher match = MARKER1.matcher(body);
     if (!match.find()) return false;
     data.strSource = getOptGroup(match.group(1));
-    data.strUnit = getOptGroup(match.group(2));
+    data.strUnit = getOptGroup(match.group(2)).replace(" ", "");
     body = body.substring(match.end()).trim();
     if (data.strSource.length() == 0 && data.strUnit.length() == 0) return false;
     
@@ -189,6 +189,7 @@ public class DispatchA29Parser extends FieldProgramParser {
   private void addUnit(String field, Data data) {
     Set<String> unitSet = new HashSet<String>();
     if (data.strUnit.length() > 0) unitSet.addAll(Arrays.asList(data.strUnit.split(",")));
+    field = field.replace(" ", "");
     for (String unit : field.split(",")) {
       if (!unitSet.contains(unit)) {
         unitSet.add(unit);
