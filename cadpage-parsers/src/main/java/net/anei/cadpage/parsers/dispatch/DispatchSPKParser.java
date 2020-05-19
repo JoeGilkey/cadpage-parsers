@@ -30,7 +30,7 @@ public class DispatchSPKParser extends HtmlProgramParser {
   public DispatchSPKParser(Properties cityCodes, String defCity, String defState) {
     super(cityCodes, defCity, defState,
          "( SELECT/1 Incident_Information%EMPTY! Event_Code:CALL! Incident_Number:ID! Location_Information%EMPTY! LOCATION! LOCATION_X? ( Remarks/Narratives%EMPTY! INFO1/N+? | ) Responding_Units%EMPTY! UNIT! SKIP+? LINE_MARK! " +
-         "| CURDATETIME? Incident_Information%EMPTY! CAD_Incident:ID? ( Event_Code:CALL! THRD_PRTY_INFO+? | Event_Code_Description:CALL! | ) Priority:PRI? Incident_Disposition:SKIP? DATA<+? )", 
+         "| CURDATETIME? Incident_Information%EMPTY! CAD_Incident:ID? ( Event_Code:CALL! THRD_PRTY_INFO+? | Event_Code_Description:CALL! | ) DATA<+? )", 
          "table|tr");
     
     Field addrCityField = getField("ADDRCITY");
@@ -47,6 +47,7 @@ public class DispatchSPKParser extends HtmlProgramParser {
     Field nameField = getField("NAME");
     Field phoneField = getField("PHONE");
     Field placeField = getField("PLACE");
+    Field priorityField = getField("PRI");
     Field skipField = getField("SKIP");
     Field unitField = getField("UNIT");
     Field zipField = getField("ZIP");
@@ -86,6 +87,7 @@ public class DispatchSPKParser extends HtmlProgramParser {
     FIELD_MAP.put("Persons", skipField);
     FIELD_MAP.put("POI Information", placeField);
     FIELD_MAP.put("Priors", skipField);
+    FIELD_MAP.put("Priority", priorityField);
     FIELD_MAP.put("Responding Units", unitField);
     FIELD_MAP.put("Service Requests", skipField);
     FIELD_MAP.put("Wrecker Info", skipField);
@@ -122,6 +124,8 @@ public class DispatchSPKParser extends HtmlProgramParser {
     times = null;
     infoType = null;
     colNdx = -1;
+    
+    prevFld = procFld = null;
     
     if (body.startsWith("Incident Information\n")) {
       setSelectValue("1");
@@ -262,13 +266,13 @@ public class DispatchSPKParser extends HtmlProgramParser {
     }
   }
   
+  private Field procFld;
+  private Field prevFld;
+  
   /**
    * This class handles a large collection of data field that can come in any order.  
    */
   private class BaseDataField extends Field {
-    
-    private Field procFld;
-    private Field prevFld;
     
     @Override
     public boolean canFail() {
@@ -303,7 +307,7 @@ public class DispatchSPKParser extends HtmlProgramParser {
       // info field and if this is info keyword, do not check for the general data keyword
       field = stripFieldStart(field, "- ");
       if (!(procFld instanceof BaseInfoField &&
-          ( field.equals("Name") || INFO_KEYWORD_PTN.matcher(field).matches()))) {
+          ( field.equals("Name") || field.startsWith("Priority:")|| INFO_KEYWORD_PTN.matcher(field).matches()))) {
         Field tmpFld;
         int pt = field.indexOf(':');
         if (pt >= 0) {

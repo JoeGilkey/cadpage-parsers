@@ -2562,7 +2562,7 @@ public class FieldProgramParser extends SmartAddressParser {
     }
   }
   
-  private static final Pattern ZIP_PATTERN = Pattern.compile("\\d{5}");
+  private static final Pattern ZIP_PATTERN = Pattern.compile("\\d{5}|");
   public class ZipField extends Field {
     
     @Override
@@ -2573,7 +2573,7 @@ public class FieldProgramParser extends SmartAddressParser {
     @Override
     public boolean checkParse(String field, Data data) {
       if (! ZIP_PATTERN.matcher(field).matches()) return false;
-      data.strCity = field;
+      if (data.strCity.length() == 0) data.strCity = field;
       return true;
     }
 
@@ -3081,6 +3081,19 @@ public class FieldProgramParser extends SmartAddressParser {
     @Override
     public String getFieldNames() {
       return null;
+    }
+  }
+  
+  public class LabelInfoField extends Field {
+    @Override
+    public void parse(String field, Data data) {
+      if (field.length() == 0) return;
+      data.strSupp = append(data.strSupp, "\n", getRelativeField(0));
+    }
+    
+    @Override
+    public String getFieldNames() {
+      return "INFO";
     }
   }
 
@@ -3916,6 +3929,7 @@ public class FieldProgramParser extends SmartAddressParser {
     if (name.equals("PHONE")) return new PhoneField();
     if (name.equals("INFO")) return new InfoField();
     if (name.equals("UNK")) return new UnknownField();    // For unknown fields never known to be non-empty
+    if (name.equals("LINFO")) return new LabelInfoField();
     if (name.equals("SRC")) return new SourceField();
     if (name.equals("CODE")) return new CodeField();
     if (name.equals("NAME")) return new NameField();

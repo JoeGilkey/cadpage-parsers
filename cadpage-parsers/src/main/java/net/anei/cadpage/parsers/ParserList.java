@@ -17,7 +17,7 @@ public class ParserList {
       return parserList;
     }
     
-    private ParserCategory(String name, Object ... objs) {
+    ParserCategory(String name, Object ... objs) {
       this.name = name;
       List<ParserEntry> entryList = new ArrayList<ParserEntry>();
       int ndx = 0;
@@ -106,6 +106,7 @@ public class ParserList {
               ,"Cadpage3"                       ,"Standard Cadpage Format C"
               ,"StandardNationalWeatherService" ,"National Weather Service"
               ,"StandardSpottedDog"             ,"Spotted Dog Technologies"
+              ,"AiviaAED"                       ,"Aivia AED"
           ),
           new ParserCategory("Alabama"
               ,"ALAutaugaCounty"                ,"Autauga County, AL"
@@ -123,6 +124,7 @@ public class ParserList {
               ,"ALDallasCounty"                 ,"Dallas County, AL"
               ,"ALDothan"                       ,"Dothan, AL"
               ,"ALEtowahCounty"                 ,"Etowah County, AL"
+              ,"ALFranklinCounty"               ,"Franklin County, AL"
               ,"ALGenevaCounty"                 ,"Geneva County, AL"
               ,"ALHenryCounty"                  ,"Henry County, AL"
               ,"ALHoover"                       ,"Hoover, AL"
@@ -352,6 +354,7 @@ public class ParserList {
               ,"GACoffeeCounty"                 ,"Coffee County, GA"
               ,"GAColquittCounty"               ,"Colquitt County, GA"
               ,"GADadeCounty"                   ,"Dade County, GA"
+              ,"GADawsonCounty"                 ,"Dawson County, GA"
               ,"GADecaturCounty"                ,"Decatur County, GA"
               ,"GADoolyCounty"                  ,"Dooly County, GA"
               ,"GADoughertyCounty"              ,"Dougherty County, GA"
@@ -503,6 +506,7 @@ public class ParserList {
               ,"INVermillionCounty"             ,"Vermillion County, IN"
               ,"INVigoCounty"                   ,"Vigo County, IN"
               ,"INWabashCounty"                 ,"Wabash County, IN"
+              ,"INWashingtonCounty"             ,"Washington County, IN"
               ,"INWayneCounty"                  ,"Wayne County, IN"
               ,"INWhitleyCounty"                ,"Whitley County, IN"
           ),
@@ -517,6 +521,7 @@ public class ParserList {
               ,"IAJacksonCounty"                ,"Jackson County, IA"
               ,"IAJasperCounty"                 ,"Jasper County, IA"
               ,"IAJohnsonCounty"                ,"Johnson County, IA"
+              ,"IAMarionCounty"                 ,"Marion County, IA"
               ,"IAMitchellCounty"               ,"Mitchell County, IA"
               ,"IAMuscatineCounty"              ,"Muscatine County, IA"
               ,"IAPolkCounty"                   ,"Polk County, IA"
@@ -878,6 +883,7 @@ public class ParserList {
               ,"MOGreeneCounty"                 ,"Greene County, MO"
               ,"MOHarrisonCounty"               ,"Harrison County, MO"
               ,"MOHenryCounty"                  ,"Henry County,  MO"
+              ,"MOHowardCounty"                 ,"Howard County, MO"
               ,"MOHowellCounty"                 ,"Howell County, MO"
               ,"MOIronCounty"                   ,"Iron County, MO"
               ,"MOJacksonCounty"                ,"Jackson County, MO"
@@ -1145,6 +1151,7 @@ public class ParserList {
               ,"NDDivideCounty"                 ,"Divide County, ND"
               ,"NDKidderCounty"                 ,"Kidder County, ND"
               ,"NDPierceCounty"                 ,"Pierce County, ND"
+              ,"NDRichlandCounty"               ,"Richland County, ND"
           ),
           new ParserCategory("Ohio"
               ,"OHAdamsCounty"                  ,"Adams County, OH"
@@ -1429,6 +1436,7 @@ public class ParserList {
               ,"TXAcadianAmbulance"             ,"Acadian Ambulance, TX"
               ,"TXAngleton"                     ,"Angleton, TX"
               ,"TXAransasCounty"                ,"Aransas County, TX"
+              ,"TXAtascosaCounty"               ,"Atascosa County, TX"
               ,"TXBellCounty"                   ,"Bell County, TX"
               ,"TXBexarCounty"                  ,"Bexar County, TX"
               ,"TXBosqueCounty"                 ,"Bosque County, TX"
@@ -1554,6 +1562,7 @@ public class ParserList {
               ,"VAAppomattoxCounty"             ,"Appomattox County, VA"
               ,"VAArlingtonCounty"              ,"Arlington County, VA"
               ,"VAAugustaCounty"                ,"Augusta County, VA"
+              ,"VABathCounty"                   ,"Bath County, VA"
               ,"VABedfordCounty"                ,"Bedford County, VA"
               ,"VABotetourtCounty"              ,"Botetourt County, VA"
               ,"VABrunswickCounty"              ,"Brunswick County, VA"
@@ -1663,6 +1672,7 @@ public class ParserList {
               ,"WVBerkeleyCounty"               ,"Berkeley County, WV"
               ,"WVBooneCounty"                  ,"Boone County, WV"
               ,"WVCabellCounty"                 ,"Cabell County, WV"
+              ,"WVClayCounty"                   ,"Clay County, WV"
               ,"WVFayetteCounty"                ,"Fayette County, WV"
               ,"WVGrantCounty"                  ,"Grant County, WV"
               ,"WVGreenbrierCounty"             ,"Greenbrier County, WV"
@@ -1675,6 +1685,7 @@ public class ParserList {
               ,"WVLincolnCounty"                ,"Lincoln County, WV"
               ,"WVMarionCounty"                 ,"Marion County, WV"
               ,"WVMasonCounty"                  ,"Mason County, WV"
+              ,"WVMercerCounty"                 ,"Mercer County, WV"
               ,"WVMineralCounty"                ,"Mineral County, WV"
               ,"WVMorganCounty"                 ,"Morgan County, WV"
               ,"WVPendletonCounty"              ,"Pendleton County, WV"

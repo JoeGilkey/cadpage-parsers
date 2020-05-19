@@ -42,7 +42,13 @@ public class CTLitchfieldCountyAParser extends FieldProgramParser {
       if (!match.find()) return false;
       body = match.group(1).trim();
     }
-    return parseMsg(subject, body, data);
+    if (!parseMsg(subject, body, data)) return false;
+    int pt = data.strApt.indexOf("**COVID ALERT**");
+    if (pt >= 0) {
+      data.strAlert = "COVID ALERT";
+      data.strApt = append(data.strApt.substring(0,pt).trim(), "-", data.strApt.substring(pt+15).trim());
+    }
+    return true;
   }
 
   private static final Pattern MASTER1 = Pattern.compile("(.*) RESPOND TO +(.*?)(?::|--| -)(\\d\\d:\\d\\d)\\b\\**(.*)");
@@ -103,7 +109,7 @@ public class CTLitchfieldCountyAParser extends FieldProgramParser {
   
   @Override
   public String getProgram() {
-    return "SRC " + super.getProgram() + " INFO";
+    return "SRC " + super.getProgram().replace("APT", "APT ALERT") + " INFO";
   }
   
   private static final String CODE_PTN_STR = "\\d{1,3}-[A-Z]-\\d{1,2}(?:-?[A-Z])?|(?:\\d{1,2}-)?(?:HOT|ALPHA|COLD)|\\d+|";
@@ -123,7 +129,7 @@ public class CTLitchfieldCountyAParser extends FieldProgramParser {
     if (name.equals("GPS1")) return new MyGPSField(1);
     if (name.equals("GPS2")) return new MyGPSField(2);
     if (name.equals("X1")) return new CrossField("CS= *(.*)", true);
-    if (name.equals("APT1")) return new AptField("Apt *(.*)", true);
+    if (name.equals("APT1")) return new MyApt1Field();
     return super.getField(name);
   }
   
@@ -299,6 +305,26 @@ public class CTLitchfieldCountyAParser extends FieldProgramParser {
     }
 
     CTLitchfieldCountyParser.fixCity(data);
+  }
+  
+  private static final Pattern APT_CALL_PTN = Pattern.compile("(.*?) *((?:1st |2nd |3rd )?Call in Town)", Pattern.CASE_INSENSITIVE);
+  private class MyApt1Field extends AptField {
+    @Override
+    public void parse(String field, Data data) {
+      if (!field.startsWith("Apt")) abort();
+      field = field.substring(3).trim();
+      Matcher match =  APT_CALL_PTN.matcher(field);
+      if (match.matches()) {
+        field = match.group(1);
+        data.strCall = append(data.strCall, " - ", match.group(2));
+      }
+      super.parse(field, data);
+    }
+    
+    @Override
+    public String getFieldNames() {
+      return "APT CALL";
+    }
   }
   
   private static final String[] PROTECTED_STREET_LIST = new String[]{
